@@ -7,4 +7,5 @@ Skills for AI harness.
 Skills in `skills/`
 
 * `dev/` — daily coding (unstable)
+* `personal/` — personal use only
 
