@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shoya Ask"
+  short_description: "Clarify vague work into an approved specification"
+  default_prompt: "Use $shoya-ask to clarify this request into a complete, implementation-ready specification."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shoya Review"
+  short_description: "Review implementations with independent evidence"
+  default_prompt: "Use $shoya-review to perform an independent, end-to-end review of this implementation."
