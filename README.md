@@ -1,4 +1,4 @@
-# shoya-skills
+# shoya_skills
 
 Skills for AI harness.
 
