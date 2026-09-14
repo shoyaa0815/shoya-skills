@@ -1,98 +1,64 @@
 ---
 name: shoya-ask
-description: Turn vague product, feature, system, API, UI, automation, or coding requests into an implementation-ready specification through persistent clarification. Use when the user wants an exhaustive spec interview, requirements are ambiguous or contradictory, or implementation must not begin until intent is explicitly aligned.
+description: Convert ambiguous product or coding requests into lean, implementation-ready specifications by resolving only consequential uncertainty. Use for spec interviews, unclear or conflicting requirements, and work that must be aligned before implementation; do not use when observable behavior is already sufficiently defined.
 ---
 
 # Shoya Ask
 
-Act as a demanding but helpful requirements partner. Keep clarifying until the request is precise enough that a different competent implementer could build and verify it without guessing.
+Reach shared, buildable intent with the least user effort. Stay in specification mode: inspect and clarify, but do not edit or implement.
 
-## Interview Contract
+## Spend Questions Carefully
 
-- Stay in specification mode. Do not implement, edit files, or present the plan as final while blocking uncertainty remains.
-- Inspect user-provided artifacts or the existing project when they can answer factual questions. Ask the user about intent and tradeoffs; do not ask them to rediscover facts that can be checked safely.
-- Match the user's language and technical level. Explain jargon briefly when it affects a decision.
-- Ask concrete questions tied to decisions. Do not ask generic prompts such as "anything else?"
-- Never silently resolve contradictions. State the conflicting interpretations and ask the user to choose or approve a recommended resolution.
-- Do not repeat answered questions. When an answer changes earlier requirements, identify exactly what became invalid and reopen only those decisions.
-- Persistence means continuing across as many rounds as necessary, not overwhelming the user in one message. Ask a small, prioritized batch of related questions per round.
+Inspect repository instructions, relevant code, docs, tests, and user artifacts before asking factual questions. Preserve stated decisions and terminology.
 
-## Maintain a Living Spec Ledger
+For each unknown, first decide whether it can be:
 
-After each user response, update these four buckets internally and show a compact version when it helps the user verify alignment:
+1. answered from evidence;
+2. inherited from an established convention;
+3. safely delegated as a reversible implementation detail;
+4. deferred with an owner and resolution point; or
+5. answered only by the user.
 
-1. **Confirmed** — explicit requirements and accepted defaults.
-2. **Assumptions** — proposed interpretations not yet accepted.
-3. **Open decisions** — missing choices that could change implementation or acceptance.
-4. **Conflicts and risks** — incompatible requirements, important edge cases, or dependencies outside the user's control.
+Ask only category 5 questions that can materially change user-visible behavior, scope, acceptance, a public contract, persisted data, permissions, security, cost, or an irreversible action. Rank them by expected rework avoided relative to answer effort.
 
-Treat inferred preferences as assumptions, never as confirmed facts. Preserve the user's terminology where possible.
+Ask one highest-leverage question per round by default; batch up to three only when independent and easy to answer together. Make it concrete, give 2–3 meaningful options when helpful, state the recommended default and its consequence, and accept free-form answers. Never ask “anything else?”, repeat an answer, or expose a giant questionnaire.
 
-## Interview Loop
+If the user delegates a choice, adopt and record the safest fitting default rather than asking for approval again. Never silently settle contradictions or consequential product intent.
 
-Repeat this loop until the readiness gate passes:
+## Maintain a Compact Model
 
-1. Restate the current objective and the newest understanding in precise language.
-2. Find the highest-impact gap, contradiction, or unverifiable success condition.
-3. Ask one to five related questions. Prefer questions that eliminate whole branches of possible implementations.
-4. When useful, provide two or three concrete options, explain the tradeoff in one sentence each, and recommend one. Always allow the user to give a different answer.
-5. Convert answers into observable rules, examples, and acceptance criteria.
-6. Recheck earlier answers for consequences and contradictions.
-7. Continue immediately with the next unresolved area; do not declare readiness merely because the user answered one round.
+Keep an internal ledger of:
 
-If the user says "you decide," "whatever," or gives another non-answer, propose a specific default and request approval. A default becomes confirmed only after explicit acceptance, including a blanket statement such as "accept all recommended defaults."
-
-If the user cannot know an answer yet, record it as an unresolved item with an owner, a method for deciding it, and the latest point at which it must be resolved. A genuinely deferred decision is acceptable only when the implementation can safely preserve that flexibility.
-
-## Coverage and Depth
-
-Use [references/spec-coverage.md](references/spec-coverage.md) as the coverage map and question bank. Read it when beginning a new interview or when checking readiness. Apply only relevant sections, but explicitly mark important sections as covered or not applicable; do not silently skip them.
-
-Push vague words into measurable meanings. Examples include "fast," "simple," "secure," "responsive," "support," "real-time," "large," "user-friendly," and "done." Ask for thresholds, supported cases, examples, or a decision rule.
-
-For every important behavior, seek at least:
-
-- trigger or precondition;
-- expected happy-path result;
-- boundary and failure behavior;
-- permissions or actor differences;
+- confirmed behavior and repository facts;
+- material assumptions or delegated defaults;
+- blocking decisions and contradictions;
+- safely deferred items;
 - observable acceptance evidence.
 
-Use concrete examples to expose ambiguity. For rules involving data, state, money, dates, permissions, concurrency, or destructive actions, include representative edge cases and ask the user to validate them.
+Show only the delta after each answer unless a compact recap would expose misalignment. Translate vague qualities such as “fast” or “secure” into a threshold, supported case, example, or decision rule only when they affect acceptance.
+
+Draft the likely specification early. Each answer should close multiple branches where possible. Reopen only decisions invalidated by new information.
+
+For complex, cross-system, regulated, destructive, data-sensitive, or explicitly exhaustive work, read [references/spec-coverage.md](references/spec-coverage.md) and audit only relevant domains. Ordinary requests should not load it.
 
 ## Readiness Gate
 
-The spec is ready only when all of the following are true:
+Stop interviewing when another competent implementer can build and verify the request without guessing about consequential intent. Require:
 
-- The problem, target users, desired outcome, and success measures are explicit.
-- In-scope and out-of-scope behavior is clear.
-- All material flows, states, errors, edge cases, and actor permissions are defined.
-- Interfaces, data contracts, integrations, constraints, and quality requirements relevant to the task are resolved.
-- Acceptance criteria are observable and testable.
-- There are no unresolved contradictions.
-- Every remaining unknown is demonstrably non-blocking and has an explicit resolution plan.
-- The user has confirmed the consolidated spec.
+- explicit objective, relevant actors, scope, non-goals, and observable success;
+- defined happy path plus material boundary, failure, state, and permission behavior;
+- resolved relevant interfaces, data rules, integrations, and constraints;
+- testable acceptance criteria;
+- no unresolved contradiction or blocking decision.
 
-Do not weaken this gate because the conversation is long. If progress stalls, summarize the exact blockers and ask the smallest question that can unblock them.
+Do not demand detail that cannot affect implementation or verification. If blocked, report the exact gap and ask the smallest unblocking question.
 
-## Finalize the Specification
+## Deliver the Spec
 
-When no blocking questions remain, present one consolidated spec containing:
+Produce one concise source of truth: objective; scope/non-goals; actors; behavioral requirements and key flows; relevant data/interfaces/constraints; failure rules; acceptance criteria; defaults; and safe deferrals. Omit empty sections and narration.
 
-- objective and context;
-- users or actors;
-- scope and non-goals;
-- functional requirements and key flows;
-- data, interfaces, and integration requirements when relevant;
-- edge cases and failure behavior;
-- non-functional requirements and constraints;
-- acceptance criteria;
-- accepted assumptions and defaults;
-- deferred non-blocking decisions, owners, and deadlines;
-- a short decision log for consequential tradeoffs.
+Ask for approval or corrections. Apply corrections as deltas, then reissue only the affected portion unless the user requests the full spec. After explicit approval, end specification mode or hand off to implementation only when already authorized.
 
-End by asking the user to approve or correct the consolidated spec. If they correct it, update the ledger and resume the interview. Only after explicit approval may specification mode end. If the original request also authorized implementation, proceed from the approved spec; otherwise stop after delivering the approved specification.
+If the user knowingly accepts a named unresolved risk, record it as an explicit assumption and never describe the spec as fully validated.
 
-## Exit Conditions
-
-End the interview without a confirmed spec only if the user explicitly cancels it or explicitly instructs the assistant to proceed despite named unresolved risks. In the latter case, list the unresolved assumptions and obtain acknowledgement before implementation. Never portray that result as a fully validated spec.
+Default responses during the interview to under 150 words. Spend more only on the final spec or a risk whose consequence cannot be explained safely within that limit.

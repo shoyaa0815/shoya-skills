@@ -1,114 +1,33 @@
-# Specification Coverage Map
+# Risk-Weighted Coverage Audit
 
-Use this reference to find omissions, not as a questionnaire to dump on the user. Select the questions that can materially change the result, group related ones, and derive follow-ups from the answers.
+Use only for complex, high-risk, or explicitly exhaustive specifications. Cover relevant domains; do not turn this map into a questionnaire. Resolve facts from artifacts, inherit established conventions, and ask the user only about consequential intent.
 
-## 1. Problem and Outcome
+## Product
 
-- What problem exists now, for whom, and in what situation?
-- What outcome should change after delivery?
-- What evidence or metric proves success? What would count as failure?
-- Why is this needed now, and is there a fixed deadline or event?
-- Is the requested solution mandatory, or may a better solution to the same problem be proposed?
+- Problem, target actor, desired outcome, success/failure signal, urgency.
+- Scope, non-goals, priorities, compatibility, supported platforms or regions.
+- Main journey: entry, preconditions, actions, result, feedback, cancellation and recovery.
 
-## 2. Actors and Permissions
+## Behavior
 
-- Who uses, administers, supports, audits, or receives output from the system?
-- What can each role view, create, change, approve, export, or delete?
-- Are anonymous, suspended, expired, invited, or partially configured users possible?
-- Which actor owns each action and each recovery path?
+- Roles and permissions, including anonymous, suspended, expired, and administrative states where plausible.
+- Empty, minimum, maximum, malformed, duplicate, stale, conflicting, timeout, retry, and partial-failure cases.
+- State transitions, side effects, idempotency, concurrency, and destructive-action safeguards.
+- UI states: loading, empty, error, offline, success, denied; accessibility and localization when relevant.
 
-## 3. Scope
+## Contracts and Data
 
-- What exact capability is included in this delivery?
-- What adjacent capability is deliberately excluded?
-- What existing behavior must remain unchanged?
-- Which platforms, devices, browsers, locales, regions, tenants, or versions are supported?
-- Is backward compatibility required, and for how long?
+- Entities, required/unique/derived/sensitive fields, ownership, source of truth, units and time zones.
+- Retention, deletion, audit, migration, import/export, backfill, and backward compatibility.
+- API or event schemas, authentication, errors, pagination, ordering, retries, rate limits, and versioning.
+- Third-party credentials, limits, availability, sandbox behavior, and degraded operation.
 
-## 4. User and System Flows
+## Quality and Delivery
 
-For each flow, determine:
+- Measurable performance, capacity, availability, recovery, privacy, security, and compliance targets.
+- Observability, rollout, flags, rollback, operations, documentation, and support ownership.
+- Required automated/manual/security/performance evidence, accepting party, and launch blockers.
 
-- entry point and prerequisites;
-- ordered actions or system events;
-- validation rules and business rules;
-- state transitions and side effects;
-- successful result and user-visible feedback;
-- cancellation, retry, timeout, duplicate action, and partial failure behavior;
-- empty, minimum, maximum, malformed, stale, and conflicting input behavior.
+## Audit Result
 
-Ask for an example of the most common case and the most dangerous failure case.
-
-## 5. UI and Content
-
-- What screens, components, states, and navigation changes are needed?
-- What must be visible, editable, disabled, hidden, or confirmed?
-- What are the loading, empty, error, offline, success, and permission-denied states?
-- Are responsive breakpoints, accessibility level, keyboard behavior, or localization required?
-- Is there an existing design system or reference experience to follow?
-- Who supplies final copy, labels, assets, and translations?
-
-## 6. Data and Business Rules
-
-- What entities, fields, types, units, ranges, defaults, and relationships exist?
-- Which fields are required, unique, derived, immutable, sensitive, or auditable?
-- What is the source of truth? Who may change it?
-- How are dates, time zones, currency, rounding, ordering, and identifiers handled?
-- What are the retention, deletion, import, export, migration, and backup rules?
-- How are concurrent edits, idempotency, duplication, and stale data handled?
-
-## 7. APIs, Events, and Integrations
-
-- Who calls whom, through what protocol, and with what authentication?
-- What are the request, response, error, pagination, filtering, and versioning contracts?
-- What delivery guarantees, ordering, retry, timeout, rate-limit, and idempotency rules apply?
-- Which third-party limits, sandboxes, credentials, webhooks, or availability assumptions matter?
-- What happens when a dependency is slow, unavailable, inconsistent, or returns partial data?
-
-## 8. Quality Attributes
-
-Turn each relevant quality into a measurable target:
-
-- performance: latency percentile, throughput, payload, or dataset size;
-- availability and resilience: uptime, recovery time, recovery point, degradation behavior;
-- scalability: expected and peak load, growth horizon, concurrency;
-- security: authentication, authorization, encryption, abuse prevention, secrets;
-- privacy and compliance: personal data, consent, residency, retention, audit requirements;
-- accessibility and usability: target standard and supported interaction modes;
-- observability: logs, metrics, traces, alerts, dashboards, and audit trail;
-- maintainability: ownership, supported runtime, dependency or architecture constraints.
-
-## 9. Delivery and Operations
-
-- What codebase, environment, architecture, conventions, and dependencies constrain the work?
-- Are schema changes, backfills, flags, staged rollout, or rollback required?
-- How will existing users or data transition?
-- Who deploys, approves, operates, and supports it?
-- What documentation, training, analytics, monitoring, or runbooks are deliverables?
-
-## 10. Verification and Acceptance
-
-- Express each acceptance criterion as a specific setup/action/result or other observable rule.
-- Cover success, validation failure, dependency failure, boundary values, and permission differences.
-- Identify required automated tests, manual checks, security checks, performance tests, and supported environments.
-- State who accepts the result and what evidence they need.
-- Distinguish launch-blocking criteria from desirable follow-ups.
-
-## 11. Priority and Tradeoffs
-
-- Which requirement wins when speed, cost, scope, quality, and compatibility conflict?
-- What is must-have, should-have, could-have, and explicitly not planned?
-- Which defaults has the user accepted, and which choices require a named decision maker?
-- What may be simplified without defeating the objective?
-
-## Readiness Audit
-
-Before consolidating, classify every relevant section as:
-
-- **Resolved** — explicit and testable;
-- **Accepted default** — recommendation explicitly approved by the user;
-- **Deferred safely** — non-blocking, with owner and resolution point;
-- **Not applicable** — excluded for a stated reason; or
-- **Blocking** — continue interviewing.
-
-Any relevant section left unclassified is a gap. Any blocking item prevents final approval.
+Classify each relevant domain as **resolved**, **evidence-backed convention**, **delegated default**, **safely deferred**, **not applicable**, or **blocking**. Record reasoning only for surprising classifications. A blocking item prevents approval; an irrelevant detail must not prolong the interview.

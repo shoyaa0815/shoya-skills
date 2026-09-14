@@ -7,10 +7,11 @@ Skills for AI harness.
 Skills in `skills/`
 
 * `dev/` — daily coding (unstable)
-  * `shoya-ask` — persistent, exhaustive requirements clarification before implementation
+  * `shoya-ask` — high-signal clarification with minimal questions and implementation-ready specs
   * `shoya-build` — traceable implementation of approved changes with verification evidence
   * `shoya-debug` — evidence-first debugging that proves root causes before repair
-  * `shoya-review` — independent, flow-to-flow code review by a fresh reviewer
+  * `shoya-idea` — evidence-driven feature discovery with compact decision briefs
+  * `shoya-review` — outsider review that questions intent and verifies changes end to end
 
 ## Install
 
@@ -26,7 +27,7 @@ selected `SKILL.md` directory into the location supported by that agent.
 To install non-interactively, pass the target agent and skill names:
 
 ```bash
-npx skills@latest add shoyaa0815/shoya-skills --agent codex --skill shoya-ask --skill shoya-build --skill shoya-debug --skill shoya-review --yes
+npx skills@latest add shoyaa0815/shoya-skills --agent codex --skill shoya-ask --skill shoya-build --skill shoya-debug --skill shoya-idea --skill shoya-review --yes
 ```
 
 Update installed skills later with:

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shoya Idea"
+  short_description: "Find high-value code features with minimal context"
+  default_prompt: "Use $shoya-idea to inspect this codebase and propose the highest-value next feature concisely."
