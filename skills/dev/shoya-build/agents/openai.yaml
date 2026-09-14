@@ -1,4 +1,4 @@
 interface:
   display_name: "Shoya Build"
-  short_description: "Build approved changes with traceable verification"
-  default_prompt: "Use $shoya-build to implement this approved change and verify it against its acceptance criteria."
+  short_description: "Ship minimal changes with risk-based proof"
+  default_prompt: "Use $shoya-build to implement this change end to end and prove each acceptance criterion concisely."

@@ -1,74 +1,57 @@
 ---
 name: shoya-build
-description: Implement an approved specification or a sufficiently explicit coding change with requirement-to-code traceability and verification evidence. Use when the user has authorized implementation; do not use for specification interviews, diagnosis-only requests, or read-only reviews.
+description: Implement an authorized, sufficiently defined coding change end to end with requirement-to-code traceability and risk-proportional verification. Use for approved specifications or explicit implementation requests; do not use for ideation, clarification-only, diagnosis-only, or read-only review.
 ---
 
 # Shoya Build
 
-Turn an authorized change into a verified implementation without losing the intent behind it. Maintain a lightweight chain from each acceptance criterion to the code changed and the evidence that demonstrates the resulting behavior.
+Deliver the requested behavior with the smallest complete, proven change. Preserve user intent, unrelated work, and authorization boundaries.
 
-## Establish the Build Contract
+## Lock the Contract
 
-Before editing, inspect the repository instructions, current worktree state, relevant entry points, tests, and the specification or task artifacts supplied by the user. Do not ask the user for facts that the repository can answer.
+Before editing, inspect repository instructions, worktree state, relevant entry points, tests, and supplied task artifacts. Search before opening broad files. Establish a baseline that distinguishes pre-existing changes and failures from yours.
 
-Treat any of these as a valid build contract:
+Extract internally:
 
-- a consolidated specification the user approved;
-- explicit acceptance criteria or an existing task artifact the user asked to implement;
-- a direct implementation request precise enough to determine observable success without choosing product behavior on the user's behalf.
+- objective, scope, non-goals, constraints, and observable acceptance criteria;
+- likely affected flow and verification needed for each criterion;
+- consequential assumptions and risks.
 
-Extract the objective, in-scope and out-of-scope behavior, constraints, acceptance criteria, and required verification. Assign short criterion identifiers internally when the source does not provide them. Do not create a planning or ledger file in the repository unless the user or repository instructions require one.
+Do not create a plan file or narrate this ledger unless requested. A direct request is sufficient when success is observable without choosing product intent. Resolve facts from the repository and choose conventional, reversible implementation details yourself. Ask one smallest question only when a missing choice could materially change behavior, public contracts, persisted data, permissions, security, cost, or destructive effects.
 
-If a missing decision would materially alter user-visible behavior, a public interface, persisted data, security, cost, or destructive side effects, stop and ask the smallest question needed to resolve it. For ordinary reversible implementation details that do not change the contract, choose the option most consistent with repository evidence and report the assumption in the handoff.
+If the requested behavior already exists, verify and report it; avoid churn.
 
-## Build in Verifiable Slices
+## Build the Shortest Complete Path
 
-Organize the work into the smallest cohesive slices that each deliver observable behavior. For every slice:
+Work in cohesive vertical slices. For each slice:
 
-1. Trace the affected flow through its actual entry point, validation, business logic, state or data access, side effects, output, and failure handling as relevant.
-2. Identify which acceptance criteria the slice advances and how they will be verified.
-3. Make the smallest complete change that preserves existing conventions and unrelated user work.
-4. Add or update tests at the behavior boundary most capable of catching a regression. Do not change tests merely to bless incorrect output.
-5. Run focused verification before moving on. Broaden verification when shared code, contracts, schemas, configuration, or cross-cutting behavior changed.
-6. Record the code locations and verification evidence for the affected criteria.
+1. Trace the real path from entry and validation through state or side effects to output and failure handling.
+2. Make the smallest change that fully advances named criteria and follows local conventions.
+3. Add or update a behavior-boundary test when it adds material regression evidence; never weaken assertions to bless a defect.
+4. Run the narrowest meaningful test or check, then broaden only according to blast radius.
 
-Prefer vertical behavior over batches such as “all models, then all handlers, then all tests” when a vertical slice can expose integration errors earlier. Keep the traceability ledger in working memory unless persistence is required for a long-running or multi-session task.
+Keep criterion → code → evidence traceability in memory. Prefer observable behavior over speculative abstraction, premature generalization, or unrelated cleanup. Preserve compatible interfaces unless the contract requires change.
+
+Verification depth follows risk: shared contracts, schemas, security, concurrency, migrations, configuration, and cross-cutting code require broader checks than isolated local behavior. Exercise relevant success, boundary, failure, permission, and state-transition paths—not a ritual checklist.
+
+When a check fails, first determine whether the failure is caused by the change, pre-existing, or environmental. Preserve evidence. Do not stack speculative fixes, suppress errors, remove safeguards, or expand scope merely to make checks pass.
 
 ## Control Drift
 
-Implementation discoveries may refine mechanics but must not silently rewrite the contract.
+Repository discoveries may change mechanics, not intent. Adapt silently when acceptance behavior is preserved. Stop for user direction when evidence conflicts with consequential intent. Continue independent criteria safely if one is blocked, but label the result partial.
 
-- If repository evidence only changes how the requirement should be implemented, adapt and continue.
-- If the requested behavior already exists, verify it and avoid needless code churn.
-- If the repository contradicts the specification, determine whether the conflict is a stale factual assumption or an unresolved intent decision. Correct the former when acceptance behavior remains unchanged; ask about the latter.
-- If one criterion cannot be completed, continue independent criteria when doing so is safe, then report the exact blocker. Do not represent partial completion as complete.
-- If verification exposes an unrelated pre-existing failure, preserve its evidence and distinguish it from regressions introduced by the change. Do not expand scope to fix it without authorization unless it directly prevents the requested implementation.
-
-Never weaken an acceptance criterion, suppress an error, remove a safeguard, or skip a required check merely to obtain a passing result.
+Do not alter unrelated user changes. Inspect the final diff specifically for accidental edits, generated noise, secrets, debugging residue, missing migrations or documentation, and contract changes not covered by acceptance criteria.
 
 ## Completion Gate
 
-Call the build complete only when:
+Finish only when every in-scope criterion is implemented and linked to concrete evidence; relevant checks pass; material edge and failure paths were considered; required compatibility, configuration, docs, and migrations are present; and no known regression or unrelated edit was introduced. Passing tests alone is insufficient. A blocked or unverified criterion means partial completion.
 
-- every in-scope acceptance criterion is implemented, no in-scope criterion remains blocked, and anything determined to be out of scope is explicitly identified;
-- each implemented criterion maps to concrete changed code and behavioral evidence;
-- relevant tests, static checks, builds, or manual checks have run successfully in proportion to the change;
-- affected error, boundary, permission, and state-transition paths have been considered;
-- required documentation, configuration, migrations, or compatibility handling are included;
-- the final diff contains no known unrelated edits introduced by the build.
+## Compact Handoff
 
-Passing tests alone is not proof that the requested behavior is complete. Inspect the final diff and re-read the build contract before handing off.
+Lead with the outcome. Then report only:
 
-If any in-scope criterion remains blocked, report the build as partial or blocked even when every other criterion passes verification.
+- criterion status with primary code/test references;
+- verification commands and results;
+- consequential assumptions, deviations, blockers, or residual risks.
 
-## Handoff
-
-Lead with the implemented outcome. Then provide a compact traceability summary containing:
-
-- each acceptance criterion and its status;
-- the main code or test evidence for it;
-- verification commands or checks performed and their results;
-- approved or non-material assumptions and any deviations;
-- blockers, unverified areas, or remaining risks.
-
-Use clickable file and line references when supported. Keep internal implementation narration out of the handoff unless it helps the user evaluate a consequential tradeoff. If the user asks for an independent review after the build, hand the completed implementation to the applicable review workflow without biasing the reviewer with suspected findings.
+Group criteria sharing the same evidence. Use clickable file references. Omit exploration logs, routine mechanics, repeated summaries, and generic advice. Default to under 200 words unless complexity or risk requires more.

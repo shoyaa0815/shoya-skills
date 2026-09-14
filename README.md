@@ -8,7 +8,7 @@ Skills in `skills/`
 
 * `dev/` — daily coding (unstable)
   * `shoya-ask` — high-signal clarification with minimal questions and implementation-ready specs
-  * `shoya-build` — traceable implementation of approved changes with verification evidence
+  * `shoya-build` — minimal end-to-end implementation with risk-based verification
   * `shoya-debug` — evidence-first debugging that proves root causes before repair
   * `shoya-idea` — evidence-driven feature discovery with compact decision briefs
   * `shoya-review` — outsider review that questions intent and verifies changes end to end
