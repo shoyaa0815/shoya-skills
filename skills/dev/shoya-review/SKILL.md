@@ -1,54 +1,58 @@
 ---
 name: shoya-review
-description: Perform an evidence-isolated, flow-to-flow review of an existing implementation, using a fresh subagent when available and a repository-first blind review fallback otherwise. Use when the user asks for a Shoya Review or wants an unbiased review that reconstructs the project from source evidence; do not use for ordinary code explanation or implementation work.
+description: Audit an existing implementation through independent, risk-ranked, end-to-end code-flow analysis with reproducible evidence. Use for Shoya Review or an unbiased implementation review; not for explanation, design-only feedback, or fixing code.
 ---
 
 # Shoya Review
 
-Review the implementation from the perspective of a competent engineer encountering the project for the first time.
+Find consequential defects with high confidence and low noise.
 
-## Independent Reviewer
+## Setup
 
-- Prefer delegating the review to a newly spawned subagent with no inherited conversation turns.
-- Give a delegated reviewer only the user's review request, the repository or target path, and any explicit scope or acceptance criteria supplied by the user. Do not include prior conclusions, suspected bugs, implementation rationale, or hints that could bias the review.
-- If fresh-agent delegation is unavailable, continue immediately in repository-first blind review mode. Do not refuse the review or ask the user to open another session.
-- In blind review mode, treat only the user's review request, explicit scope or acceptance criteria, and evidence independently rediscovered from the repository as admissible. Set aside prior conclusions, suspected bugs, implementation rationale, remembered file summaries, and earlier claims about how the code works.
-- Whether delegated or direct, start discovery from the repository itself. Read the relevant documentation and code again, identify entry points, and build a new evidence trail before judging the implementation. Do not use conversation memory as a substitute for repository evidence.
-- Keep the review read-only. Do not edit or fix code unless the user separately asks for implementation after receiving the findings.
-- Do not claim that a direct blind review erased the model's context. Its independence comes from restricting conclusions to a newly reconstructed repository evidence trail.
+- Prefer a fresh subagent with no inherited turns. Give it only the request, target, and explicit requirements. Otherwise review directly from newly gathered repository evidence; never claim context was erased.
+- Remain read-only unless the user separately authorizes fixes.
+- For a change, establish the baseline and diff; follow unchanged code only when an affected flow reaches it. For a repository, derive entry points from docs, manifests, routing, and tests.
+- Resolve ambiguity from repository evidence. Ask only if competing answers materially change the review.
 
-## Review Flow to Flow
+## Review
 
-Trace each relevant behavior end to end rather than reviewing isolated files. Follow the actual path through entry points, validation, business logic, state or data access, integrations, side effects, output, and failure handling.
+1. Map affected flows and trust boundaries; rank them by harm and uncertainty.
+2. Prioritize security, data integrity, contracts, permissions, concurrency, external side effects, and recovery.
+3. Trace each important flow: input -> validation -> logic/state -> persistence/integration -> output/error. Where relevant, cover boundaries, denial, retries, partial failure, and concurrency.
+4. Try to disprove every suspected defect against callers, callees, guards, types, schemas, configuration, migrations, and tests.
+5. Use the smallest safe check that changes confidence: a targeted existing test or minimal reproduction. Avoid external writes and broad mutations.
 
-For every flow in scope:
+Batch discovery and searches; read narrow regions and expand only across relevant boundaries. Spend depth by risk and stop after scoped high-risk flows are traced and more inspection is unlikely to change the result. Do not narrate exploration.
 
-1. Establish the intended behavior from repository evidence and the user's explicit requirements.
-2. Trace the happy path across component and file boundaries.
-3. Trace important alternate, boundary, permission, and failure paths.
-4. Check whether data, state transitions, side effects, errors, and user-visible results remain consistent throughout the flow.
-5. Run focused, safe verification when it can confirm or disprove a suspected problem.
+## Finding Gate
 
-Prioritize correctness bugs, security issues, data loss or corruption, broken contracts, race conditions, missing failure handling, and meaningful requirement gaps. Mention maintainability or test gaps only when they create a concrete risk. Ignore purely stylistic preferences unless the user requests them.
+Report a defect only with:
 
-## Evidence Standard
+- exact path and file/line evidence;
+- realistic trigger and observable impact;
+- proof that safeguards do not prevent it;
+- verification performed or precisely still needed.
 
-- Report only findings supported by a reproducible path through the code or strong repository evidence.
-- Verify assumptions against callers, callees, configuration, schemas, and tests before presenting them as facts.
-- Do not invent findings, inflate severity, or force a minimum number of issues. An honest result may contain no findings.
-- Distinguish confirmed defects from unresolved questions. Do not present speculation as a defect.
-- Account for existing safeguards and tests; do not report an issue that the implementation already prevents.
+Exclude style, harmless cleanup, speculation, duplicate root causes, and test gaps without behavioral risk. Put material uncertainty under **Open questions**. Zero findings is valid.
 
-## Deliverable
+Grade impact, not confidence:
 
-Return the review findings ordered by impact. Each finding must include:
+- **Critical:** practical catastrophic compromise or widespread irreversible loss.
+- **High:** security bypass, serious corruption/loss, or core-flow failure.
+- **Medium:** meaningful wrong behavior with limited scope or workaround.
+- **Low:** minor concrete defect; omit trivial polish unless requested.
 
-- severity;
-- affected flow;
-- exact file and line evidence;
-- what triggers the problem;
-- observable impact;
-- concise remediation direction;
-- verification performed or still needed.
+## Output
 
-After the findings, summarize the flows reviewed, validation performed, and any important coverage limits. If no actionable defect is found, say so directly and still state what was reviewed and what could not be verified.
+List findings by severity, then likelihood. Use one compact block each:
+
+`[Severity] Title — file:line`
+
+State flow, trigger, impact, failed safeguard, and verification/remediation direction. Group locations sharing one root cause.
+
+Then provide only:
+
+- **Open questions** — material unresolved issues, if any.
+- **Coverage** — flows, checks, and important limits.
+
+If nothing survives the gate, say so directly. Passing tests never proves absence of defects.

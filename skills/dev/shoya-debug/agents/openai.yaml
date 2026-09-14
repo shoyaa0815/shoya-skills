@@ -1,4 +1,4 @@
 interface:
   display_name: "Shoya Debug"
-  short_description: "Prove root causes before fixing failures"
-  default_prompt: "Use $shoya-debug to reproduce this failure, prove its root cause, and fix it only if authorized."
+  short_description: "Find and fix root causes with minimal evidence"
+  default_prompt: "Use $shoya-debug to diagnose this failure with the smallest decisive evidence loop, then fix and verify it if authorized."

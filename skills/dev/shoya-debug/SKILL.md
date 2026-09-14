@@ -1,107 +1,55 @@
 ---
 name: shoya-debug
-description: Evidence-first diagnosis of software failures through reproduction, end-to-end tracing, falsifiable hypotheses, and root-cause proof. Use when tests, builds, runtime behavior, performance, or integrations fail unexpectedly; implement a fix only when the user also asks for one.
+description: Diagnose unexpected software failures with the smallest decisive evidence loop, then fix the proven cause when authorized. Use for failing tests or builds, runtime bugs, regressions, flaky behavior, performance issues, and broken integrations; not for ordinary implementation or speculative cleanup.
 ---
 
 # Shoya Debug
 
-Reproduce the failure, locate the first incorrect transition, and prove the causal mechanism before proposing or applying a fix.
+Find the first wrong transition, explain its mechanism, and—when requested—repair the causal surface. Optimize for decisive evidence, not investigative volume.
 
-## Operating Stance
+## Contract
 
-- **Evidence before explanation.** Logs, traces, tests, state, and code paths outrank intuition and error-message wording.
-- **One hypothesis, one discriminating experiment.** Every experiment states why it is being run and what result would support or weaken the hypothesis.
-- **Root cause, not symptom relief.** Distinguish the trigger, causal defect, contributing conditions, and visible symptom.
-- **Diagnosis does not imply mutation.** Keep investigation read-only unless the user explicitly asks to fix the problem. Temporary local instrumentation is an implementation change and requires the same authorization.
+- Separate observed facts, inferences, and unknowns; prefer `unresolved` to invented certainty.
+- Diagnosis-only stays read-only. A fix request authorizes normal local implementation and verification, not production actions, data repair, upgrades, or unrelated refactors.
+- Preserve user changes. Inspect repository instructions and worktree state before editing.
 
-## Workflow
+## Minimal Evidence Loop
 
-Run these stages in order. Return to an earlier stage when new evidence invalidates its conclusions.
+Repeat only while the next observation can change the conclusion:
 
-### 1. Frame — what exactly is failing?
+1. **Frame:** State expected behavior, observed behavior, and the smallest known trigger. Ask only for user-held context that would change the path.
+2. **Observe:** Run the narrowest realistic reproduction, or use preserved evidence when reproduction is unsafe. Record the exact command/input and meaningful output, not entire logs.
+3. **Trace:** Follow the executed slice around the failure across code, config, data, and boundaries. Locate the last correct state and first incorrect state. Error text and stack frames are leads, not proof.
+4. **Discriminate:** Test the leading mechanism with the cheapest safe check that could falsify it. Change one variable; use a passing control when useful.
+5. **Conclude:** Label the cause `confirmed`, `probable`, or `unresolved`. If uncertain, name the single highest-value missing observation.
 
-- State expected behavior and observed behavior separately.
-- Capture the triggering input or action, exact failure output, affected environment, frequency, impact, and last-known-good state when available.
-- Inspect repository instructions, current worktree state, relevant configuration, tests, and recent changes before asking the user for facts the workspace can answer.
-- Separate confirmed facts from reports and assumptions. If essential user-only context is missing, ask the smallest question that can change the investigation path.
+A compiler-localized typo may need one trace and verification. Expand investigation for flaky, concurrent, environment-specific, performance, distributed, security-sensitive, or destructive failures.
 
-Do not silently redefine the bug around whatever is easiest to reproduce.
+## Evidence Rules
 
-### 2. Reproduce — make the failure observable
+A confirmed cause connects trigger → defect → first wrong state → symptom, and an appropriate control or repair removes that path. `Probable` means the mechanism fits available evidence but the decisive observation is unavailable.
 
-- Reproduce with the smallest realistic path that still exhibits the reported behavior.
-- Record the exact command, input, environment, and output. Establish whether the failure is deterministic, intermittent, environment-specific, or not reproduced.
-- Compare against a control when useful: a passing input, prior revision, alternate environment, or direct call below a suspected layer.
-- Preserve the original evidence before changing code, configuration, dependencies, caches, or state.
+Use evidence already present before creating more: inspect the failure and nearby code before broad searches; read only relevant callers, callees, config, schema, and history; compare passing and failing cases at their earliest divergence; distinguish baseline failures from target failures.
 
-If reproduction would be destructive, affect production, contact external parties, or mutate data outside the authorized scope, do not run it. Use safe evidence or request authorization for the exact action.
+Keep a hypothesis ledger only when multiple explanations remain credible or the failure is flaky: `mechanism | discriminating check | result | status`. Drop rejected candidates. Never shotgun-edit, bundle speculative fixes, treat a passing retry as proof, or repeat an unchanged experiment without new reason.
 
-### 3. Trace — find the first wrong transition
+Preserve original evidence before changing code, state, caches, or dependencies. If reproduction would affect production, external data or people, or exceed authorization, stop at that boundary and request the exact permission or artifact needed.
 
-- Follow the real path from trigger to symptom: entry point → validation → branches → state or data access → integrations → side effects → output or failure.
-- Include unchanged callers, callees, configuration, schemas, and boundaries around the suspicious code. A stack trace is a lead, not the whole execution path.
-- Identify the last state known to be correct and the first state known to be incorrect.
-- Mark surprising branches, implicit conversions, stale state, retries, ordering, concurrency, and swallowed or transformed errors. Surprises are candidate evidence, not conclusions.
+## Repair When Requested
 
-### 4. Falsify — test competing explanations
+Change the smallest causal surface and verify the original failing path. Add or tighten a regression test when it provides durable coverage; check neighboring behavior and error paths in proportion to risk, not by reflexively running everything.
 
-Maintain a compact hypothesis ledger. For each candidate state:
+A small reversible fix may serve as the controlled experiment. If it does not validate the mechanism, revert only that speculative change and resume diagnosis. Remove instrumentation and inspect the final diff.
 
-- the proposed causal mechanism;
-- evidence that would support it;
-- evidence that would falsify it;
-- the cheapest safe experiment that distinguishes it from alternatives;
-- its status: `untested`, `supported`, `weakened`, or `rejected`.
+Do not claim success from a test that bypasses or mocks away the failing boundary. State exactly what remains unverified and why.
 
-Rank hypotheses by fit with the evidence, not familiarity. Change one meaningful variable at a time. Do not repeat a failed experiment without new evidence, and do not bundle speculative fixes as a diagnostic test.
+## Compact Report
 
-### 5. Prove — establish the root cause
+Lead with `fixed and verified`, `root cause confirmed`, `probable cause`, or `unresolved`, then include only:
 
-Call a root cause confirmed only when the evidence explains:
+- **Cause:** one-sentence mechanism or leading unknown.
+- **Evidence:** decisive reproduction, trace, and control; cite files/lines when useful.
+- **Action:** applied change or smallest recommendation.
+- **Verification:** checks, results, and nearest material limit.
 
-- the trigger and required conditions;
-- the exact mechanism from correct state to incorrect state;
-- why the observed symptom follows;
-- why important passing or non-affected cases remain unaffected;
-- which plausible alternatives were ruled out.
-
-When a controlled test is feasible, show that introducing the causal condition produces the failure and removing it removes the failure. If the evidence cannot meet this gate, report the cause as probable or unresolved instead of upgrading confidence through repetition.
-
-### 6. Repair — fix only when authorized
-
-If the user requested diagnosis only, stop after the evidence-backed diagnosis and remediation direction.
-
-Enter repair only when the root cause passes the confirmation gate above. A request to fix the problem does not lower that evidence threshold. If the cause remains probable or unresolved, do not mutate the implementation; report `needs more evidence` and name the next discriminating evidence required.
-
-If the user also requested a fix and the root cause is confirmed:
-
-- change the smallest causal surface rather than suppressing the symptom;
-- add a regression test that exercises the reproduced path and fails without the fix when feasible;
-- verify the original reproduction, relevant neighboring behavior, and error paths;
-- remove temporary instrumentation and speculative changes that are not part of the repair;
-- inspect the final diff to ensure the repair did not absorb unrelated cleanup.
-
-A passing test is insufficient when it bypasses the failing path, mocks away the causal boundary, or asserts only an intermediate state.
-
-### 7. Report
-
-Lead with one of: `root cause confirmed`, `probable cause`, `unresolved`, or `fixed and verified`.
-
-For each confirmed or probable cause, provide one tight section:
-
-- **Cause** — the defect and causal mechanism in one sentence.
-- **Evidence** — reproduction and traced code or state, with file and line references when applicable.
-- **Ruled out** — the closest competing explanations and the evidence against them.
-- **Remediation** — the smallest appropriate correction; state whether it was applied.
-- **Verification** — the commands or checks performed, why each mattered, and its result.
-
-Close with a one-line verdict: `fix verified`, `ready to fix`, `needs more evidence`, or `blocked`, followed by the single most important reason. Name coverage limits and preserve uncertainty; do not pad the report with a debugging diary.
-
-## Operating Rules
-
-- **No shotgun debugging.** Do not make several unrelated changes and infer causality from a later pass.
-- **No error-message literalism.** Verify where an error originates and how it reaches the user before treating its wording as the cause.
-- **No retry-as-proof.** A transient pass does not disprove a race, timing, cache, or environment failure.
-- **No hidden baseline failures.** Distinguish failures introduced by the target change from pre-existing or unrelated failures.
-- **No scope laundering.** A bug investigation does not authorize refactors, dependency upgrades, data repair, production actions, or external mutations.
-- **No forced certainty.** If available evidence supports multiple causes, say what would distinguish them and stop when the remaining evidence is inaccessible or unsafe to obtain.
+Mention alternatives only if genuinely competitive. Do not narrate the debugging diary or repeat raw output.

@@ -1,4 +1,4 @@
 interface:
   display_name: "Shoya Review"
-  short_description: "Question intent and verify changes end to end"
-  default_prompt: "Use $shoya-review to independently scrutinize this change end to end, including its intent, simpler alternatives, real code paths, and claims."
+  short_description: "High-confidence, low-noise implementation review"
+  default_prompt: "Use $shoya-review to audit this implementation end to end, prioritize risk, and report only reproducible findings."
